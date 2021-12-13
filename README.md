@@ -1,6 +1,6 @@
 # OpenAPI
 
-优雅的跨平台脚本API，一种代码，同时支持Quantumult X, Loon, Surge, JSBox 和Node JS。让开发者更轻松在Node平台调试代码。
+优雅的跨平台脚本API，一种代码，同时支持Quantumult X, Loon, Surge, JSBox 和Node.js。让开发者更轻松在Node.js平台调试代码。
 
 ## 示例
 
@@ -38,13 +38,48 @@ $.notify("title", "subtitle", "content"); // 简单标题
 // URL标题
 
 $.notify("title", "subtitle", "content", {"open-url": "https://www.bing.com"})
-// 多媒体标题，QX >= build 316, 其他平台不会显示多媒体内容。
-$.notify("title", "subtitle", "content", {"media-url": "https://avatars2.githubusercontent.com/u/21050064?s=460&u=40a74913dd0a3d00670d05148c3a08c787470021&v=4"}) 
+// 多媒体标题，QX >= build 316 || Node.js, 其他平台不会显示多媒体内容。
+$.notify("title", "subtitle", "content", {"media-url": "https://avatars.githubusercontent.com/u/88471740"}) 
+```
+
+#### Node.js通知参数
+Node.js环境中，需要使用`export`声明通知参数，也可以在脚本内直接赋值。参考[说明文档](https://asvow.com/param)。
+
+```javascript
+// 微信server酱
+$.SCKEY = "";
+// pushplus(推送加)
+$.PUSH_PLUS_TOKEN = "";
+$.PUSH_PLUS_USER = "";
+// iOS Bark APP
+$.BARK_PUSH = "";
+$.BARK_SOUND = "";
+$.BARK_GROUP = "";
+// Telegram 机器人
+$.TG_BOT_TOKEN = "";
+$.TG_USER_ID = "";
+$.TG_PROXY_HOST = "";
+$.TG_PROXY_PORT = "";
+$.TG_PROXY_AUTH = "";
+$.TG_API_HOST = "api.telegram.org";
+// 钉钉机器人
+$.DD_BOT_TOKEN = "";
+$.DD_BOT_SECRET = "";
+// 企业微信机器人
+$.QYWX_KEY = "";
+// 企业微信应用消息推送
+$.QYWX_AM = "";
+// iGot
+$.IGOT_PUSH_KEY = "";
+// go-cqhttp
+$.GOBOT_URL = "";
+$.GOBOT_TOKEN = "";
+$.GOBOT_QQ = "";
 ```
 
 ### HTTP
 
-HTTP接口在Node使用request实现，需要用npm安装request。推荐通过如下操作安装到全局，并link。
+HTTP接口在Node.js使用request实现，需要用npm安装request。推荐通过如下操作安装到全局，并link。
 
 ```bash
 npm install -g request
@@ -154,9 +189,9 @@ $1.write("data", "key");
 $2.write("data", "key");
 ```
 
-#### 2. Node & JSBox (2.0+)
+#### 2. Node.js & JSBox (2.0+)
 
-Node环境中，`cache`会被保存到和脚本同级目录下的`name.json`中。
+Node.js环境中，`cache`会被保存到和脚本同级目录下的`name.json`中。
 
 **如果希望在脚本里直接存取`$prefs`或者`$persistentStore`里面的缓存，可以通过在`KEY`前面加`#`号实现：**
 
@@ -175,7 +210,7 @@ $.wait(1000).then(()=>{
 })
 
 // 在任何Promise后面可以自定义delay
-$.get("http://www.baidu.com")
+$.http.get("http://www.baidu.com")
 .delay(1000) // 延迟1000毫秒
 .then(resp => {
   // do something with response.
