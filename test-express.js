@@ -1,28 +1,28 @@
 const app = express({debug: true});
 const $request = {
-    url: "https://sub.store/users/10086/Peng-YM",
-    method: "GET",
-    headers: {}
+	url: "https://sub.store/users/10086/Peng-YM",
+	method: "GET",
+	headers: {}
 }
 const $done = (resp) => {
-    console.log("=================== Response ===============================");
-    console.log(JSON.stringify(resp, null, 2));
+	console.log("=================== Response ===============================");
+	console.log(JSON.stringify(resp, null, 2));
 }
 const $task = {};
 
 app.all("/home", async function (req, res) {
-    res.send("HELLO from express!");
+	res.send("HELLO from express!");
 });
 app
-    .route("/users/:userid")
-    .post(function (req, res) {
-        res.send(`POST USER: ${req.params.userid}`);
-    })
-    .get(function (req, res) {
-        res.send(`GET USER ${req.params.userid}`);
-    });
+	.route("/users/:userid")
+	.post(function (req, res) {
+		res.send(`POST USER: ${req.params.userid}`);
+	})
+	.get(function (req, res) {
+		res.send(`GET USER ${req.params.userid}`);
+	});
 app.get("/users/:userid/:name", function (req, res) {
-    res.send(req.params.name);
+	res.send(req.params.name);
 })
 app.start();
 
