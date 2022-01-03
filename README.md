@@ -1,6 +1,6 @@
-# OpenAPI
+# Tiny OpenAPI
 
-优雅的跨平台脚本API，一种代码，同时支持Quantumult X, Loon, Surge, JSBox 和Node JS。让开发者更轻松在Node平台调试代码。
+优雅的跨平台脚本API，一种代码，同时支持Quantumult X, Loon, Surge, Scriptable 和Node.js。让开发者更轻松在Node.js平台调试代码。
 
 ## 示例
 
@@ -25,26 +25,31 @@ $.error("Some error message"); // 错误信息，不受debug影响。
 
 ```javascript
 $.env.isQX;
-$.env.isSurge;
 $.env.isLoon;
+$.env.isSurge;
 $.env.isNode;
-$.env.isJSBox;
+$.env.isScriptable;
 ```
 
 ### 通知
 
 ```javascript
 $.notify("title", "subtitle", "content"); // 简单标题
-// URL标题
 
-$.notify("title", "subtitle", "content", {"open-url": "https://www.bing.com"})
+// URL标题
+$.notify("title", "subtitle", "content", {"open-url": "https://www.bing.com"});
+
 // 多媒体标题，QX >= build 316, 其他平台不会显示多媒体内容。
-$.notify("title", "subtitle", "content", {"media-url": "https://avatars2.githubusercontent.com/u/21050064?s=460&u=40a74913dd0a3d00670d05148c3a08c787470021&v=4"}) 
+$.notify("title", "subtitle", "content", {"media-url": "https://avatars.githubusercontent.com/u/88471740"});
+
+// 通知开关
+$.isMute = ""; // 抑制通知发送(True or False, 缺省值为False)
+$.isMuteLog = ""; // 抑制通知输出(True or False, 缺省值为False)
 ```
 
 ### HTTP
 
-HTTP接口在Node使用request实现，需要用npm安装request。推荐通过如下操作安装到全局，并link。
+HTTP接口在Node.js使用request实现，需要用npm安装request。推荐通过如下操作安装到全局，并link。
 
 ```bash
 npm install -g request
@@ -154,11 +159,12 @@ $1.write("data", "key");
 $2.write("data", "key");
 ```
 
-#### 2. Node & JSBox (2.0+)
+#### 2. Node.js
 
-Node环境中，`cache`会被保存到和脚本同级目录下的`name.json`中。
+Node.js环境中，`cache`会被保存到和脚本同级目录下的`name.json`中。
 
-**如果希望在脚本里直接存取`$prefs`或者`$persistentStore`里面的缓存，可以通过在`KEY`前面加`#`号实现：**
+**如果希望直接存取`$prefs`或者`$persistentStore`里面的缓存，可以通过在`KEY`前面加`#`号实现。** 此时Node.js环境则直接存取脚本同级目录下的`root.json`里面的缓存：
+
 
 ```javascript
 $.read("#KEY");
@@ -171,11 +177,11 @@ $.write(value, "#KEY");
 
 ```javascript
 $.wait(1000).then(()=>{
-	// 等待1000毫秒之后执行
+    // 等待1000毫秒之后执行
 })
 
 // 在任何Promise后面可以自定义delay
-$.get("http://www.baidu.com")
+$.http.get("http://www.baidu.com")
 .delay(1000) // 延迟1000毫秒
 .then(resp => {
   // do something with response.
