@@ -1,6 +1,6 @@
 # OpenAPI
 
-优雅的跨平台脚本API，一种代码，同时支持Quantumult X, Loon, Surge, JSBox 和Node.js。让开发者更轻松在Node.js平台调试代码。
+优雅的跨平台脚本API，一种代码，同时支持Quantumult X, Loon, Surge, Scriptable 和Node.js。让开发者更轻松在Node.js平台调试代码。
 
 ## 示例
 
@@ -28,24 +28,31 @@ $.env.isQX;
 $.env.isSurge;
 $.env.isLoon;
 $.env.isNode;
-$.env.isJSBox;
+$.env.isScriptable;
 ```
 
 ### 通知
 
 ```javascript
 $.notify("title", "subtitle", "content"); // 简单标题
-// URL标题
 
-$.notify("title", "subtitle", "content", {"open-url": "https://www.bing.com"})
-// 多媒体标题，QX >= build 316 || Node.js, 其他平台不会显示多媒体内容。
-$.notify("title", "subtitle", "content", {"media-url": "https://avatars.githubusercontent.com/u/88471740"}) 
+// URL标题
+$.notify("title", "subtitle", "content", {"open-url": "https://www.bing.com"});
+
+// 多媒体标题，QX >= build 316, 其他平台不会显示多媒体内容。
+$.notify("title", "subtitle", "content", {"media-url": "https://avatars.githubusercontent.com/u/88471740"});
+
+// 通知开关
+$.isMute = ""; // 抑制通知发送(True or False, 缺省值为False)
+$.isMuteLog = ""; // 抑制通知输出(True or False, 缺省值为False)
 ```
 
 #### Node.js通知参数
 Node.js环境中，需要使用`export`声明通知参数，也可以在脚本内直接赋值。参考[说明文档](https://asvow.com/param)。
 
 ```javascript
+// 作者信息(缺省值为笔者信息)
+$.author = "";
 // 微信server酱
 $.SCKEY = "";
 // pushplus(推送加)
@@ -189,11 +196,11 @@ $1.write("data", "key");
 $2.write("data", "key");
 ```
 
-#### 2. Node.js & JSBox (2.0+)
+#### 2. Node.js
 
 Node.js环境中，`cache`会被保存到和脚本同级目录下的`name.json`中。
 
-**如果希望在脚本里直接存取`$prefs`或者`$persistentStore`里面的缓存，可以通过在`KEY`前面加`#`号实现：**
+**如果希望直接存取`$prefs`或者`$persistentStore`里面的缓存，可以通过在`KEY`前面加`#`号实现。** 此时Node.js环境则直接存取脚本同级目录下的`root.json`里面的缓存：
 
 ```javascript
 $.read("#KEY");
@@ -206,7 +213,7 @@ $.write(value, "#KEY");
 
 ```javascript
 $.wait(1000).then(()=>{
-	// 等待1000毫秒之后执行
+  // 等待1000毫秒之后执行
 })
 
 // 在任何Promise后面可以自定义delay

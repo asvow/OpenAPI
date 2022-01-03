@@ -2,46 +2,44 @@
  * OpenAPI
  * @author: AsVow
  * @Modified form: Peng-YM
- * https://github.com/asvow/OpenAPI/blob/master/README.md
+ * https://github.com/asvow/OpenAPI/blob/main/README.md
  */
 function ENV() {
-  const isQX = typeof $task !== "undefined";
-  const isLoon = typeof $loon !== "undefined";
-  const isSurge = typeof $httpClient !== "undefined" && !isLoon;
-  const isJSBox = typeof require == "function" && typeof $jsbox != "undefined";
-  const isNode = typeof require == "function" && !isJSBox;
-  const isRequest = typeof $request !== "undefined";
-  const isScriptable = typeof importModule !== "undefined";
+  const isQX = typeof $task !== 'undefined';
+  const isLoon = typeof $loon !== 'undefined';
+  const isSurge = typeof $httpClient !== 'undefined' && !isLoon;
+  const isNode = typeof module !== 'undefined' && !!module.exports;
+  const isRequest = typeof $request !== 'undefined';
+  const isScriptable = typeof importModule !== 'undefined';
   return {
     isQX,
     isLoon,
     isSurge,
     isNode,
-    isJSBox,
     isRequest,
     isScriptable
   };
 }
 
 function HTTP(defaultOptions = {
-  baseURL: ""
+  baseURL: ''
 }) {
   const {
     isQX,
     isLoon,
     isSurge,
+    isNode,
     isScriptable,
-    isNode
   } = ENV();
-  const methods = ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"];
+  const methods = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS', 'PATCH'];
   const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
 
   function send(method, options) {
-    options = typeof options === "string" ? {
+    options = typeof options === 'string' ? {
       url: options
     } : options;
     const baseURL = defaultOptions.baseURL;
-    if (baseURL && !URL_REGEX.test(options.url || "")) {
+    if (baseURL && !URL_REGEX.test(options.url || '')) {
       options.url = baseURL ? baseURL + options.url : options.url;
     }
     if (options && options.body && options.headers && !options.headers['Content-Type']) {
@@ -71,7 +69,7 @@ function HTTP(defaultOptions = {
       });
     } else if (isLoon || isSurge || isNode) {
       worker = new Promise((resolve, reject) => {
-        const request = isNode ? require("request") : $httpClient;
+        const request = isNode ? require('request') : $httpClient;
         request[method.toLowerCase()](options, (err, response, body) => {
           if (err) reject(err);
           else
@@ -130,13 +128,12 @@ function HTTP(defaultOptions = {
   return http;
 }
 
-function API(name = "untitled", debug = false) {
+function API(name = 'untitled', debug = false) {
   const {
     isQX,
     isLoon,
     isSurge,
     isNode,
-    isJSBox,
     isScriptable
   } = ENV();
   return new(class {
@@ -147,10 +144,13 @@ function API(name = "untitled", debug = false) {
       this.http = HTTP();
       this.env = ENV();
 
+      isNode && (this.isMute = process.env.isMute || this.isMute, this.isMuteLog = process.env.isMuteLog || this.isMuteLog);
+      this.startTime = new Date().getTime();
+      console.log(`🔔${name}, 开始!`);
+
       this.node = (() => {
         if (isNode) {
-          const fs = require("fs");
-
+          const fs = require('fs');
           return {
             fs,
           };
@@ -158,6 +158,7 @@ function API(name = "untitled", debug = false) {
           return null;
         }
       })();
+
       this.initCache();
 
       const delay = (t, v) =>
@@ -175,18 +176,18 @@ function API(name = "untitled", debug = false) {
     // persistence
     // initialize cache
     initCache() {
-      if (isQX) this.cache = JSON.parse($prefs.valueForKey(this.name) || "{}");
+      if (isQX) this.cache = JSON.parse($prefs.valueForKey(this.name) || '{}');
       if (isLoon || isSurge)
-        this.cache = JSON.parse($persistentStore.read(this.name) || "{}");
+        this.cache = JSON.parse($persistentStore.read(this.name) || '{}');
 
       if (isNode) {
         // create a json for root cache
-        let fpath = "root.json";
+        let fpath = 'root.json';
         if (!this.node.fs.existsSync(fpath)) {
           this.node.fs.writeFileSync(
             fpath,
             JSON.stringify({}), {
-              flag: "wx"
+              flag: 'wx'
             },
             (err) => console.log(err)
           );
@@ -199,7 +200,7 @@ function API(name = "untitled", debug = false) {
           this.node.fs.writeFileSync(
             fpath,
             JSON.stringify({}), {
-              flag: "wx"
+              flag: 'wx'
             },
             (err) => console.log(err)
           );
@@ -221,14 +222,14 @@ function API(name = "untitled", debug = false) {
         this.node.fs.writeFileSync(
           `${this.name}.json`,
           data, {
-            flag: "w"
+            flag: 'w'
           },
           (err) => console.log(err)
         );
         this.node.fs.writeFileSync(
-          "root.json",
+          'root.json',
           JSON.stringify(this.root, null, 2), {
-            flag: "w"
+            flag: 'w'
           },
           (err) => console.log(err)
         );
@@ -237,7 +238,7 @@ function API(name = "untitled", debug = false) {
 
     write(data, key) {
       this.log(`SET ${key}`);
-      if (key.indexOf("#") !== -1) {
+      if (key.indexOf('#') !== -1) {
         key = key.substr(1);
         if (isSurge || isLoon) {
           return $persistentStore.write(data, key);
@@ -256,7 +257,7 @@ function API(name = "untitled", debug = false) {
 
     read(key) {
       this.log(`READ ${key}`);
-      if (key.indexOf("#") !== -1) {
+      if (key.indexOf('#') !== -1) {
         key = key.substr(1);
         if (isSurge || isLoon) {
           return $persistentStore.read(key);
@@ -274,7 +275,7 @@ function API(name = "untitled", debug = false) {
 
     delete(key) {
       this.log(`DELETE ${key}`);
-      if (key.indexOf("#") !== -1) {
+      if (key.indexOf('#') !== -1) {
         key = key.substr(1);
         if (isSurge || isLoon) {
           return $persistentStore.write(null, key);
@@ -292,52 +293,50 @@ function API(name = "untitled", debug = false) {
     }
 
     // notification
-    notify(title, subtitle = "", content = "", options = {}) {
-      const openURL = options["open-url"];
-      const mediaURL = options["media-url"];
+    notify(title, subtitle = '', content = '', options = {}) {
+      const openURL = options['open-url'];
+      const mediaURL = options['media-url'];
+      content = content.replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm,'');
 
-      if (isQX) $notify(title, subtitle, content, options);
-      if (isSurge) {
-        $notification.post(
-          title,
-          subtitle,
-          content + `${mediaURL ? "\n多媒体:" + mediaURL : ""}`, {
-            url: openURL,
+      if (!this.isMute) {
+        if (isQX) $notify(title, subtitle, content, options);
+        if (isSurge) {
+          $notification.post(
+            title,
+            subtitle,
+            content + `${mediaURL ? '\n多媒体:' + mediaURL : ''}`, {
+              url: openURL,
+            }
+          );
+        }
+        if (isLoon) {
+          let opts = {};
+          if (openURL) opts['openUrl'] = openURL;
+          if (mediaURL) opts['mediaUrl'] = mediaURL;
+          if (this.toStr(opts) === '{}') {
+            $notification.post(title, subtitle, content);
+          } else {
+            $notification.post(title, subtitle, content, opts);
           }
-        );
-      }
-      if (isLoon) {
-        let opts = {};
-        if (openURL) opts["openUrl"] = openURL;
-        if (mediaURL) opts["mediaUrl"] = mediaURL;
-        if (JSON.stringify(opts) === "{}") {
-          $notification.post(title, subtitle, content);
-        } else {
-          $notification.post(title, subtitle, content, opts);
         }
-      }
-      if (isNode) {
-         return new Promise(async(resolve) => {
-            const content_ = (subtitle ? `${subtitle}\n` : "") + content+
-          (openURL ? `\n点击跳转: ${openURL}` : "") + (mediaURL ? "\n多媒体: " + mediaURL : "");
+        if (isNode) {
+          new Promise(async(resolve) => {
+            const content_ = (subtitle ? `${subtitle}\n` : '') +
+            content +
+            (openURL ? `\n点击跳转: ${openURL}` : '') +
+            (mediaURL ? '\n多媒体: ' + mediaURL : '');
             await this.sendNotify(title, content_, {url: openURL});
-          resolve();
-         });
-       }
-      if (isScriptable) {
-        const content_ =
-          content +
-          (openURL ? `\n点击跳转: ${openURL}` : "") +
-          (mediaURL ? `\n多媒体: ${mediaURL}` : "");
-        if (isJSBox) {
-          const push = require("push");
-          push.schedule({
-            title: title,
-            body: (subtitle ? subtitle + "\n" : "") + content_,
           });
-        } else {
-          console.log(`${title}\n${subtitle}\n${content_}\n\n`);
         }
+      }
+      if (!this.isMuteLog) {
+        let logs = ['', '==============📣系统通知📣=============='];
+        logs.push(title);
+        subtitle ? logs.push(subtitle) : '';
+        content ? logs.push(content) : '';
+        openURL ? logs.push(`点击跳转: ${openURL}`) : '';
+        mediaURL ? logs.push(`多媒体: ${mediaURL}`) : '';
+        console.log(logs.join('\n'));
       }
     }
 
@@ -346,15 +345,14 @@ function API(name = "untitled", debug = false) {
     * @param text 通知头
     * @param desp 通知体
     * @param params 某些推送通知方式点击弹窗可跳转, 例：{ url: 'https://abc.com' }
-    * @param author 作者信息
     * @returns {Promise<unknown>}
     */
-    sendNotify(text, desp, params = {}, author = '\n\n仅供用于学习 https://ooxx.be/js') {
+    sendNotify(text, desp, params = {}) {
       return new Promise(async(resolve) => {
         //提供9种通知
         this.querystring = require('querystring');
-        this.timeout = this.timeout || "15000"; //超时时间(单位毫秒)
-        desp += author; //增加作者信息，防止被贩卖等
+        this.timeout = this.timeout || '15000'; //超时时间(单位毫秒)
+        desp += this.author || '\n\n仅供用于学习 https://ooxx.be/js'; //增加作者信息
         this.setParam();
         await Promise.all([
           this.serverNotify(text, desp), //微信server酱
@@ -880,15 +878,15 @@ function API(name = "untitled", debug = false) {
 
     // other helper functions
     log(msg) {
-      if (this.debug) console.log(`[${this.name}] LOG: ${this.toStr(msg)}`);
+      if (this.debug) console.log(`[${this.name}] LOG:\n${this.toStr(msg)}`);
     }
 
     info(msg) {
-      console.log(`[${this.name}] INFO: ${this.toStr(msg)}`);
+      console.log(`[${this.name}] INFO:\n${this.toStr(msg)}`);
     }
 
     error(msg) {
-      console.log(`[${this.name}] ERROR: ${this.toStr(msg)}`);
+      console.log(`[${this.name}] ERROR:\n${this.toStr(msg)}`);
     }
 
     wait(millisec) {
@@ -896,10 +894,13 @@ function API(name = "untitled", debug = false) {
     }
 
     done(value = {}) {
+      const endTime = new Date().getTime();
+      const costTime = (endTime - this.startTime) / 1000;
+      console.log(`🔔${this.name}, 结束! 🕛 ${costTime} 秒`);
       if (isQX || isLoon || isSurge) {
         $done(value);
-      } else if (isNode && !isJSBox) {
-        if (typeof $context !== "undefined") {
+      } else if (isNode) {
+        if (typeof $context !== 'undefined') {
           $context.headers = value.headers;
           $context.statusCode = value.statusCode;
           $context.body = value.body;
