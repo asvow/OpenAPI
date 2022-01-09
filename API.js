@@ -10,6 +10,7 @@ function ENV() {
   const isSurge = typeof $httpClient !== 'undefined' && !isLoon;
   const isNode = typeof module !== 'undefined' && !!module.exports;
   const isRequest = typeof $request !== 'undefined';
+  const isResponse = typeof $response !== 'undefined';
   const isScriptable = typeof importModule !== 'undefined';
   return {
     isQX,
@@ -17,6 +18,7 @@ function ENV() {
     isSurge,
     isNode,
     isRequest,
+    isResponse,
     isScriptable
   };
 }
