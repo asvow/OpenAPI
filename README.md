@@ -28,6 +28,8 @@ $.env.isQX;
 $.env.isSurge;
 $.env.isLoon;
 $.env.isNode;
+$.env.isRequest;
+$.env.isResponse;
 $.env.isScriptable;
 ```
 
